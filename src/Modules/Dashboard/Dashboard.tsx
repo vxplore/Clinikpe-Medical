@@ -2,17 +2,29 @@ import { useState } from "react";
 import DashboardStats from "./components/DashboardStats";
 import FilterChips from "./components/ScrollableChips";
 import AppointmentCard from "./components/AppointmentCard";
+import { useDashboardStats } from "./hooks/useDashboardStats";
+import { useProviderList } from "../Providers/hooks/useProviderList";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [activeDoctor, setActiveDoctor] = useState("all");
+  const [activePurpose, setActivePurpose] = useState("all");
+  const { data: dashboardStats, isLoading: isDashboardLoading, error: dashboardError } = useDashboardStats();
+  const { providers, isLoading: isProvidersLoading, error: providersError } = useProviderList({
+    purpose: "dropdown"
+  });
+  console.log("Dashboard Stats:", isProvidersLoading, providersError);
+  console.log("Dashboard Stats:", dashboardStats);
+  const navigate = useNavigate();
 
-  const doctors = [
-    { label: "All Doctors", value: "all" },
-    { label: "Dr. Smith", value: "smith" },
-    { label: "Dr. Johnson", value: "johnson" },
-    { label: "Dr. Williams", value: "williams" },
-    { label: "Dr. Brown", value: "brown" },
-    { label: "Dr. Jones", value: "jones" },
+  console.log("Dashboard Stats:", dashboardStats);
+  console.log("Providers:", providers);
+
+  const doctorOptions = [
+    { label: "All", value: "all" },
+    { label: "Mohan", value: "mohan" },
+    { label: "dr biswajeet", value: "dr-biswajeet" },
+    { label: "dr Rohan ", value: "dr rohan" },
+    { label: "dr Treatment", value: "treatment" },
   ];
 
   const appointments = [
@@ -64,22 +76,29 @@ const Dashboard = () => {
 
   return (
     <div className="w-full space-y-2">
-      <DashboardStats />
+      <DashboardStats stats={dashboardStats} isLoading={isDashboardLoading} />
+
+      {dashboardError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Failed to load dashboard stats.
+        </div>
+      )}
+
+      
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-lg">Recent Appointments</h3>
-          <button className="text-sm text-blue-600 hover:text-blue-800">
+          <button onClick={() => navigate("/appointments")} className="text-sm text-blue-600 hover:text-blue-800">
             see all
           </button>
         </div>
-
-        <FilterChips
-          filters={doctors}
-          activeTab={activeDoctor}
-          onCategoryChange={setActiveDoctor}
-        />
       </div>
+      <FilterChips
+          filters={doctorOptions}
+          activeTab={activePurpose}
+          onCategoryChange={setActivePurpose}
+        />
 
       {/* Appointment Cards Stack */}
       <div className="space-y-4">
@@ -92,6 +111,7 @@ const Dashboard = () => {
           />
         ))}
       </div>
+      
     </div>
   );
 };

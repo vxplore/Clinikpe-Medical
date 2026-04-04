@@ -1,8 +1,8 @@
-
-
 import { Button, Card, Group } from "@mantine/core";
 import { MapPin, Edit2 } from "lucide-react";
-import {BUTTON_BLUE} from "../../Constants/colors.ts";
+import { BUTTON_BLUE } from "../../Constants/colors.ts";
+import { useNavigate } from "react-router-dom";
+import { useRegistrationStore } from "../../stores/registrationStore";
 
 interface LocationConfirmDrawerProps {
   location: {
@@ -19,6 +19,30 @@ export default function LocationConfirmDrawer({
   onConfirm,
   onEdit,
 }: LocationConfirmDrawerProps) {
+  const navigate = useNavigate();
+  const { setAddress } = useRegistrationStore();
+
+  const handleConfirmAndReturn = (location: {
+    lat: number;
+    lng: number;
+    name?: string;
+  }) => {
+    // Save address to Zustand
+    setAddress({
+      name:
+        location.name ||
+        `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`,
+      lat: location.lat,
+      lng: location.lng,
+    });
+
+    // Call the original onConfirm if needed
+    onConfirm(location);
+
+    // Navigate back to BasicDetails
+    navigate(-1);
+  };
+
   if (!location) return null;
 
   return (
@@ -40,7 +64,8 @@ export default function LocationConfirmDrawer({
                 <div>
                   <h3 className="font-semibold text-base">Selected Location</h3>
                   <p className="text-sm text-gray-600 truncate">
-                    {location.name || `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+                    {location.name ||
+                      `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
                   </p>
                 </div>
               </Group>
@@ -56,10 +81,10 @@ export default function LocationConfirmDrawer({
 
           <Card.Section className="p-4">
             <Button
-            style={{ backgroundColor: BUTTON_BLUE }}
+              style={{ backgroundColor: BUTTON_BLUE }}
               fullWidth
               size="lg"
-              onClick={() => onConfirm(location)}
+              onClick={() => handleConfirmAndReturn(location)}
               className="b hover:bg-blue-700"
             >
               Confirm Location & Continue

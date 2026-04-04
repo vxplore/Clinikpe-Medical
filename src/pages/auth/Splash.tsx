@@ -15,7 +15,7 @@ export default function Splash() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-blue-600 flex flex-col items-center justify-center px-4">
+    <div className="h-full bg-gradient-to-br from-primary to-blue-600 flex flex-col items-center justify-center px-4">
       <div className="text-center">
         <div className="mb-8 animate-float-slow">
           <div className="w-24 h-24 bg-white rounded-3xl shadow-2xl flex items-center justify-center mx-auto">

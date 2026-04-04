@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { ApiSuccess, ApiFailure } from "./ApiAgents.types";
 import { ApiError } from "./ApiError";
-import { redirectToLogin } from "./authManager";
+// import { redirectToLogin } from "./authManager";
 /* =======================
    AXIOS INSTANCE
 ======================= */
@@ -29,16 +29,16 @@ type ApiRequestConfig = {
 /* =======================
    RESPONSE INTERCEPTOR
 ======================= */
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      redirectToLogin();
-    }
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       redirectToLogin();
+//     }
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 
 /* =======================
    API REQUEST FUNCTION

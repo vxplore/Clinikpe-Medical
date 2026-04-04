@@ -2,57 +2,24 @@ import { useState } from "react";
 import { Search, Filter, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProviderCard from "./components/ProviderCard";
+import { useProviderList } from "./hooks/useProviderList";
 import { colors } from "../../Constants/colors";
 
 const Providers = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const providers = [
-    {
-      id: "1",
-      name: "Dr. D.R.K Roy",
-      specialty: "Cardiologist",
-      experience: "8+ Years Experience",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dr-DRK-Roy",
-      availableDays: ["Mon", "Tue", "Thu", "Fri"],
-      startTime: "08:00 AM",
-      endTime: "06:00 PM",
-      location: "City Medical Center",
-      videoCallAvailable: true,
-      isActive: true,
-    },
-    {
-      id: "2",
-      name: "Dr. Sarah Johnson",
-      specialty: "Dermatologist",
-      experience: "6+ Years Experience",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dr-Sarah-Johnson",
-      availableDays: ["Mon", "Wed", "Thu", "Sat"],
-      startTime: "09:00 AM",
-      endTime: "05:00 PM",
-      location: "Central Hospital",
-      videoCallAvailable: true,
-      isActive: true,
-    },
-    {
-      id: "3",
-      name: "Dr. Anup Kumar",
-      specialty: "Neurologist",
-      experience: "10+ Years Experience",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Dr-Anup-Kumar",
-      availableDays: ["Tue", "Thu", "Fri", "Sat"],
-      startTime: "10:00 AM",
-      endTime: "04:00 PM",
-      location: "Metro Medical Institute",
-      videoCallAvailable: false,
-      isActive: false,
-    },
-  ];
+  const {
+    providers: providerList,
+    isLoading,
+    error,
+  } = useProviderList({
+    search: searchQuery,
+    pageNumber: 1,
+    pageSize: 100,
+  });
 
-  const filteredProviders = providers.filter((provider) =>
-    provider.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  console.log("Providers:", providerList);
 
   const handleViewProfile = (id: string) => {
     console.log("View profile:", id);
@@ -65,6 +32,22 @@ const Providers = () => {
   const handleToggleActive = (id: string, active: boolean) => {
     console.log("Toggle active:", id, active);
   };
+
+  // Transform API provider data to ProviderCard format
+  const transformedProviders =
+    providerList?.map((provider) => ({
+      id: provider.uid,
+      name: provider.name,
+      specialty: provider.specialities[0]?.name || "-",
+      experience: `${provider.experience_of_number}+ Years Experience`,
+      image: provider.profile_pic,
+      availableDays: provider.available_minutes[0]?.days || [],
+      startTime: provider.available_minutes[0]?.start_time || "N/A",
+      endTime: provider.available_minutes[0]?.end_time || "N/A",
+      location: "Medical Store",
+      videoCallAvailable: true,
+      isActive: provider.status === "active",
+    })) || [];
 
   return (
     <div className="w-full relative ">
@@ -88,23 +71,37 @@ const Providers = () => {
         </button>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-sm">Loading providers...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-4">
+          Failed to load providers. Please try again.
+        </div>
+      )}
+
       {/* Provider Cards */}
       <div className="space-y-4">
-        {filteredProviders.length > 0 ? (
-          filteredProviders.map((provider) => (
-            <ProviderCard
-              key={provider.id}
-              provider={provider}
-              onViewProfile={handleViewProfile}
-              onManageAvailability={handleManageAvailability}
-              onToggleActive={handleToggleActive}
-            />
-          ))
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-sm">No providers found</p>
-          </div>
-        )}
+        {!isLoading && transformedProviders.length > 0
+          ? transformedProviders.map((provider) => (
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                onViewProfile={handleViewProfile}
+                onManageAvailability={handleManageAvailability}
+                onToggleActive={handleToggleActive}
+              />
+            ))
+          : !isLoading && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-sm">No providers found</p>
+              </div>
+            )}
       </div>
 
       {/* Floating Action Button */}

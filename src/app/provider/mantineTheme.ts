@@ -7,7 +7,15 @@ export const mantineTheme = createTheme({
                 size: 'lg',
                 radius: 'md',
             },
-        },
+        }
+        ,
+        Button :{
+            defaultProps: {
+                size: 'lg',
+                radius: 'md',
+            },
+        }
+        ,
         NumberInput: {
             defaultProps: {
                 size: 'lg',

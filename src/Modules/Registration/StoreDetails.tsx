@@ -34,7 +34,7 @@ const StoreDetails = () => {
   };
 
   return (
-    <div className="min-h-screen p-0 flex items-center justify-center">
+    <div className="h-full p-0 flex items-center justify-center">
       <Card className="w-full max-w-md rounded-lg">
         {/* Logo Section */}
         <div className="text-center mb-6">

@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import type { DashboardData } from "../../../Apis/modules/dashboard/dashboard.types";
 
-const DashboardStats = () => {
+interface DashboardStatsProps {
+  stats?: DashboardData;
+  isLoading?: boolean;
+}
+
+const DashboardStats = ({ stats, isLoading }: DashboardStatsProps) => {
   const [period, setPeriod] = useState("This Month");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -41,13 +47,17 @@ const DashboardStats = () => {
         {/* All Providers Card */}
         <div className="bg-blue-100 rounded-2xl p-4 py-2 flex flex-col justify-center items-start">
           <p className="text-gray-600 text-sm mb-2">All Providers</p>
-          <h2 className="text-4xl font-bold text-gray-900">32</h2>
+          <h2 className="text-4xl font-bold text-gray-900">
+            {isLoading ? "..." : (stats?.all_providers ?? 0)}
+          </h2>
         </div>
 
         {/* All Appointments Card */}
         <div className="bg-teal-100 rounded-2xl p-4 py-4 flex flex-col justify-center items-start">
           <p className="text-gray-600 text-sm mb-2">All Appointments</p>
-          <h2 className="text-4xl font-bold text-gray-900">18</h2>
+          <h2 className="text-4xl font-bold text-gray-900">
+            {isLoading ? "..." : (stats?.all_appointments ?? 0)}
+          </h2>
         </div>
       </div>
     </div>

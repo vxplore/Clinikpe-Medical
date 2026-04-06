@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { getAppointmentList } from "../../../Apis/modules/appointments/appointments.api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChnageAppointmentStatus, getAppointmentList } from "../../../Apis/modules/appointments/appointments.api";
 import type { Appointment, Pagination } from "../../../Apis/modules/appointments/appointments.types";
 
 export interface UseAppointmentListFilters {
@@ -10,9 +10,9 @@ export interface UseAppointmentListFilters {
 }
 
 export const useAppointmentList = (filters?: UseAppointmentListFilters) => {
+    console.log("Fetching appointments with filters:", filters);
     const { data, isLoading, error } = useQuery({
         queryKey: ["appointments", filters?.from_date, filters?.to_date, filters?.pageNumber, filters?.pageSize],
-        //@ts-expect-error - The API function should be updated to accept filters
         queryFn: () => getAppointmentList(filters),
         select: (response) => ({
             appointments: response.appointments,
@@ -27,5 +27,28 @@ export const useAppointmentList = (filters?: UseAppointmentListFilters) => {
         error,
     };
 };
+
+
+export const useAppointmentStatusChange = () => {
+     const queryClient = useQueryClient();
+    const { mutateAsync, isPending, error } = useMutation({
+        mutationFn: ({ appointmentId, activity }: { appointmentId: string; activity: string }) =>
+            ChnageAppointmentStatus(appointmentId, activity),
+         onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["appointments"],
+            });
+        },
+    });
+
+
+    return {
+        changeStatus: mutateAsync,
+        isLoading: isPending,
+        error,
+    }
+
+
+}
 
 export type { Appointment, Pagination };

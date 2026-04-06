@@ -3,13 +3,20 @@ import { Search, Filter, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FilterChips from "../Dashboard/components/ScrollableChips";
 import AppointmentCard from "../Dashboard/components/AppointmentCard";
-import { useAppointmentList } from "./hooks/useAppointmentList";
+import {
+  useAppointmentList,
+  useAppointmentStatusChange,
+} from "./hooks/useAppointmentList";
 
 const Appointments = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDoctor, setActiveDoctor] = useState("all");
-
+  const {
+    changeStatus,
+    isLoading: isChangingStatus,
+    error: statusChangeError,
+  } = useAppointmentStatusChange();
   // Get current date range (last 30 days to 30 days in future)
   const today = new Date();
   const fromDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -73,12 +80,20 @@ const Appointments = () => {
         phoneNumber: "+1234567890", // Not available in API
       })) || [];
 
-  const handleCancel = (id: string) => {
-    console.log("Cancel appointment:", id);
+  const handleCancel = async (id: string) => {
+    try {
+      await changeStatus({ appointmentId: id, activity: "cancel" });
+    } catch (err) {
+      console.error("Failed to cancel appointment:", err);
+    }
   };
 
-  const handleMarkComplete = (id: string) => {
-    console.log("Mark complete:", id);
+  const handleMarkComplete = async (id: string) => {
+    try {
+      await changeStatus({ appointmentId: id, activity: "completed" });
+    } catch (err) {
+      console.error("Failed to mark appointment as complete:", err);
+    }
   };
 
   const handleAddAppointment = () => {

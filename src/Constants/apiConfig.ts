@@ -4,6 +4,6 @@
  */
 
 export const API_CONFIG = {
-    organizationId: "iCZBt3C7",
-    medicalStoreId: "zlYskW7k",
+    organizationId: "5V5_aJ_9",
+    medicalStoreId: "hVl31MEa",
 } as const;
